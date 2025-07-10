@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMA SHIPPING | हिंदी</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0A2C48;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      text-align: center;
+      padding: 60px 20px 30px;
+    }
+    header h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+    header p {
+      font-size: 20px;
+      color: #CCCCCC;
+    }
+    .buttons {
+      margin: 30px 0;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .buttons a {
+      text-decoration: none;
+      background-color: #D32F2F;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .buttons a:hover {
+      background-color: #b82828;
+    }
+    .lang-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+    }
+    .lang-menu select {
+      padding: 6px;
+      border-radius: 4px;
+    }
+    footer {
+      margin-top: 60px;
+      font-size: 14px;
+      color: #AAAAAA;
+      padding-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-menu">
+    <select onchange="location = this.value;">
+      <option value="#">🌐 हिंदी</option>
+      <option value="index-en.html">English</option>
+      <option value="index-ar.html">العربية</option>
+      <option value="index-hi.html">हिंदी</option>
+      <option value="index-ur.html">اردو</option>
+    </select>
+  </div>
+
+  <header>
+    <h1>CMA SHIPPING</h1>
+    <p>वैश्विक बाजार के लिए आपका द्वार</p>
+    <p><em>CMA Sea Land द्वारा समर्थित</em></p>
+  </header>
+
+  <div class="buttons">
+    <a href="#">संपर्क करें</a>
+    <a href="#">ऐप डाउनलोड करें</a>
+    <a href="#">शिपिंग अनुरोध करें</a>
+  </div>
+
+  <footer>
+    &copy; 2025 CMA Shipping. All rights reserved.
+  </footer>
+</body>
+</html>
