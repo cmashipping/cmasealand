@@ -1,106 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CMA Sea Land</title>
+  <title>CMA SEA LAND</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
     body {
-      font-family: Arial, sans-serif;
-      background-color: #0A2C48;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      margin: 0;
+      font-family: 'Tajawal', sans-serif;
+      background-color: #0a2c45;
+      color: #ffffff;
     }
+
     header {
+      background-color: #061d30;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 40px;
-      background-color: #001D3D;
+      padding: 1rem 2rem;
     }
-    .logo {
-      height: 50px;
+
+    .logo img {
+      height: 40px;
     }
+
     nav a {
-      color: white;
-      margin-left: 25px;
+      margin-left: 1.5rem;
       text-decoration: none;
-      font-weight: bold;
+      color: #ffffff;
+      font-weight: 600;
+      transition: color 0.3s;
     }
+
     nav a:hover {
-      text-decoration: underline;
+      color: #00bcd4;
     }
+
+    .language-select {
+      padding: 0.4rem;
+      border-radius: 5px;
+      border: none;
+      font-family: 'Tajawal', sans-serif;
+    }
+
     .hero {
-      flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      height: 80vh;
       text-align: center;
-      padding: 60px 20px;
     }
+
     .hero h1 {
-      font-size: 3em;
-      margin: 20px 0 10px;
+      font-size: 3rem;
+      margin-bottom: 1rem;
     }
+
     .hero p {
-      font-size: 1.3em;
-      color: #CCCCCC;
-      margin-bottom: 20px;
+      font-size: 1.2rem;
+      color: #d1e3ec;
     }
-    .lang-select {
-      position: absolute;
-      top: 20px;
-      right: 20px;
+
+    .cta-button {
+      margin-top: 2rem;
+      background-color: #00bcd4;
+      color: #fff;
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
     }
-    .lang-select select {
-      padding: 5px;
-      border-radius: 4px;
+
+    .cta-button:hover {
+      background-color: #009fb2;
     }
+
     footer {
-      background-color: #001D3D;
-      padding: 20px;
       text-align: center;
-      font-size: 0.9em;
-      color: #AAAAAA;
+      padding: 1rem;
+      background-color: #061d30;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-  <div class="lang-select">
-    <select onchange="location = this.value;">
-      <option value="#">🌐 Language</option>
-      <option value="index-en.html">English</option>
-      <option value="index-ar.html">العربية</option>
-      <option value="index-hi.html">हिंदी</option>
-      <option value="index-ur.html">اردو</option>
-    </select>
-  </div>
 
   <header>
-    <img src="cma-shipping-logo.png" alt="CMA SHIPPING Logo" class="logo" />
+    <div class="logo">
+      <img src="logo.png" alt="CMA SEA LAND Logo" />
+    </div>
     <nav>
-      <a href="#">Home</a>
-      <a href="#">Services</a>
-      <a href="#">About</a>
-      <a href="#">Contact</a>
+      <a href="#">الرئيسية</a>
+      <a href="#services">الخدمات</a>
+      <a href="#about">من نحن</a>
+      <a href="#contact">تواصل معنا</a>
     </nav>
+    <select class="language-select">
+      <option value="ar">العربية</option>
+      <option value="en">English</option>
+    </select>
   </header>
 
-  <div class="hero">
+  <section class="hero">
     <h1>CMA SEA LAND</h1>
-    <p>Your Gate to Global Market</p>
-  </div>
+    <p>بوابتك نحو السوق العالمي</p>
+    <a href="#services" class="cta-button">ابدأ الآن</a>
+  </section>
 
   <footer>
-    &copy; 2025 CMA Shipping. All rights reserved.
+    © 2025 CMA Sea Land. جميع الحقوق محفوظة.
   </footer>
+
 </body>
 </html>
