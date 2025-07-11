@@ -5,42 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CMA SHIPPING</title>
   <style>
-    body {{
+    * {{
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }}
+    body {{
       font-family: Arial, sans-serif;
       background-color: #0A2C48;
       color: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }}
     header {{
-      padding: 20px;
-      background-color: #0A2C48;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 20px 40px;
+      background-color: #0A2C48;
+    }}
+    .logo-text {{
+      font-weight: bold;
+      font-size: 1.2rem;
     }}
     nav a {{
       color: white;
-      margin: 0 15px;
+      margin-left: 20px;
       text-decoration: none;
       font-weight: bold;
     }}
+    nav a:hover {{
+      text-decoration: underline;
+    }}
     .hero {{
+      flex-grow: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      height: 80vh;
+      padding: 40px 20px;
     }}
-    .logo {{
-      max-width: 250px;
-      margin-bottom: 20px;
+    .hero img {{
+      max-width: 300px;
+      height: auto;
+      margin-bottom: 30px;
     }}
-    h1 {{
-      font-size: 2.5em;
-      margin: 10px 0;
+    .hero h1 {{
+      font-size: 2.4em;
+      margin-bottom: 10px;
     }}
-    p {{
+    .hero p {{
       font-size: 1.1em;
       color: #CCCCCC;
     }}
@@ -48,17 +64,17 @@
 </head>
 <body>
   <header>
-    <div><strong>CMA SHIPPING</strong></div>
+    <div class="logo-text">CMA SHIPPING</div>
     <nav>
       <a href="#">Home</a>
       <a href="#">Services</a>
       <a href="#">About</a>
     </nav>
   </header>
-
   <div class="hero">
-    <img src="cma-shipping-logo.png" alt="CMA SHIPPING Logo" class="logo" />
+    <img src="cma-shipping-logo.png" alt="CMA SHIPPING Logo" />
     <h1>CMA SHIPPING</h1>
+    <p>Your Gate to Global Market</p>
   </div>
 </body>
 </html>
