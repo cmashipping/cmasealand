@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register - Individual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Tajawal', sans-serif;
+      background: url('login-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-box {
+      background-color: #0f3a56;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+    input {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.8rem;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #00bcd4;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div style="background-color: #061d30; padding: 1rem; text-align: center;">
+  <a href="home-en.html" style="color: white; margin: 0 1rem; text-decoration: none;">Home</a>
+  <a href="my-account.html" style="color: white; margin: 0 1rem; text-decoration: none;">My Account</a>
+  <a href="choose-account.html" style="color: white; margin: 0 1rem; text-decoration: none;">Register</a>
+</div>
+
+  <form class="form-box">
+    <h2>Register - Individual</h2>
+    <input type="text" placeholder="Full Name" required />
+    <input type="tel" placeholder="Mobile Number" required />
+    <input type="file" accept="image/*" required />
+    <button type="submit">Register</button>
+  </form>
+</body>
+</html>
