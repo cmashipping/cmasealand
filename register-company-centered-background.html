@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Register - Company</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('CMA Shipping Warehouse Complex.png') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      align-items: center;
+      min-height: 100vh; padding: 2rem 0;
+    }
+    .container {
+      background-color: #0f3a56;
+      padding: 2rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 500px;
+    }
+    h2 {
+      margin-top: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: none;
+      border-radius: 5px;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #00bcd4;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCzMKTWkUPymleRx5QByjPbT-R409L3CuY",
+      authDomain: "cma-sea-land.firebaseapp.com",
+      projectId: "cma-sea-land",
+      storageBucket: "cma-sea-land.appspot.com",
+      messagingSenderId: "379428651890",
+      appId: "1:379428651890:web:2678ec1add05f171c653eb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    window.submitCompanyForm = async function(e) {
+      e.preventDefault();
+
+      const company_name = document.querySelector('input[name="company_name"]').value;
+      const email = document.querySelector('input[name="email"]').value;
+      const mobile = document.querySelector('input[name="mobile"]').value;
+      const manager_name = document.querySelector('input[name="manager_name"]').value;
+      const license_expiry = document.querySelector('input[name="license_expiry"]').value;
+      const license_file = document.querySelector('input[name="license"]').files[0];
+      const tax_expiry = document.querySelector('input[name="tax_expiry"]').value;
+      const tax_file = document.querySelector('input[name="tax_certificate"]').files[0];
+
+      if (!license_file || !tax_file) {
+        alert("Please upload all required files.");
+        return;
+      }
+
+      try {
+        const licenseRef = ref(storage, 'uploads/companies/' + Date.now() + '_' + license_file.name);
+        await uploadBytes(licenseRef, license_file);
+        const licenseURL = await getDownloadURL(licenseRef);
+
+        const taxRef = ref(storage, 'uploads/companies/' + Date.now() + '_' + tax_file.name);
+        await uploadBytes(taxRef, tax_file);
+        const taxURL = await getDownloadURL(taxRef);
+
+        await addDoc(collection(db, "company_requests"), {
+          company_name,
+          email,
+          mobile,
+          manager_name,
+          license_expiry,
+          license_url: licenseURL,
+          tax_expiry,
+          tax_certificate_url: taxURL,
+          status: "pending",
+          created_at: serverTimestamp()
+        });
+
+        alert("Company registration submitted successfully!");
+        e.target.reset();
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    };
+  </script>
+</head>
+<body>
+
+
+
+
+<div class="page-header" style="width: 100%; max-width: 500px; margin: 2rem auto 1rem auto;">
+  
+</div>
+
+
+
+
+<div class="container">
+<h2>Register - Company</h2>
+
+<form onsubmit="submitCompanyForm(event)">
+<label for="company_name">Company Name:</label>
+<input name="company_name" required="" type="text"/><br/>
+<label for="email">Email:</label>
+<input name="email" required="" type="email"/><br/>
+<label for="mobile">Mobile Number:</label>
+<input name="mobile" required="" type="tel"/><br/>
+<label for="manager_name">Manager Name:</label>
+<input name="manager_name" required="" type="text"/><br/>
+<label for="license_expiry">Upload License:<br/>License Expiry Date:</label>
+<input name="license_expiry" required="" type="date"/><br/>
+<input name="license" required="" type="file"/><br/><br/>
+<label for="tax_expiry">Upload Tax Certificate:<br/>Tax Expiry Date:</label>
+<input name="tax_expiry" required="" type="date"/><br/>
+<input name="tax_certificate" required="" type="file"/><br/><br/>
+<button class="submit-btn" type="submit">Register</button>
+</form>
+
+</div>
+</body>
+</html>
