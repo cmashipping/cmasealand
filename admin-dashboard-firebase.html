@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - CMA SEA LAND</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #001c2c;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #07324f;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      color: #00bcd4;
+    }
+    .dashboard {
+      padding: 30px;
+    }
+    .notification {
+      background: #0099aa;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+    .card {
+      background: #07324f;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .card h3 {
+      margin-top: 0;
+      color: #00bcd4;
+    }
+    .actions {
+      margin-top: 15px;
+    }
+    .actions button {
+      padding: 8px 16px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .accept { background: #4caf50; color: white; }
+    .reject { background: #f44336; color: white; }
+    .comment-btn { background: #ff9800; color: white; }
+    textarea {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Admin Dashboard
+  </header>
+  <div class="dashboard">
+    <div class="notification">🔔 You have 3 new requests</div>
+
+    <div class="card">
+      <h3>Request #CMA123456</h3>
+      <p><strong>Type:</strong> Company</p>
+      <p><strong>Date:</strong> 2025-07-13</p>
+      <p><strong>Status:</strong> Pending</p>
+      <p><strong>Attached Files:</strong> trade_license.pdf, tax_cert.pdf</p>
+
+      <label for="comment1">Comment:</label>
+      <textarea id="comment1" rows="2" placeholder="Write comment..."></textarea>
+
+      <div class="actions">
+        <button class="accept">Accept</button>
+        <button class="reject">Reject</button>
+        <button class="comment-btn">Save Comment</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Request #CMA123457</h3>
+      <p><strong>Type:</strong> Driver</p>
+      <p><strong>Date:</strong> 2025-07-13</p>
+      <p><strong>Status:</strong> Pending</p>
+      <p><strong>Attached Files:</strong> license.pdf, passport.pdf</p>
+
+      <label for="comment2">Comment:</label>
+      <textarea id="comment2" rows="2" placeholder="Write comment..."></textarea>
+
+      <div class="actions">
+        <button class="accept">Accept</button>
+        <button class="reject">Reject</button>
+        <button class="comment-btn">Save Comment</button>
+      </div>
+    </div>
+  </div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBN7fyXXqP1287sNU3YooVmvxRoPd4mcho",
+    authDomain: "cma-sea-land-bb064.firebaseapp.com",
+    projectId: "cma-sea-land-bb064",
+    storageBucket: "cma-sea-land-bb064.firebasestorage.app",
+    messagingSenderId: "566265918530",
+    appId: "1:566265918530:web:92bd6b702bad69a293e9db"
+  };
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
+<script>
+const collections = [
+  { name: 'company_requests', label: 'Company' },
+  { name: 'provider_requests', label: 'Provider' },
+  { name: 'driver_requests', label: 'Driver' }
+];
+
+const dashboard = document.querySelector('.dashboard');
+dashboard.innerHTML = '<div class="notification">🔄 Loading requests...</div>';
+
+async function loadRequests() {
+  dashboard.innerHTML = '';
+  for (const col of collections) {
+    const snapshot = await db.collection(col.name).get();
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const requestId = doc.id;
+      const date = data.createdAt ? new Date(data.createdAt).toLocaleString() : "N/A";
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h3>Request #${requestId}</h3>
+        <p><strong>Type:</strong> ${col.label}</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Status:</strong> ${data.status || 'Pending'}</p>
+        <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
+        <p><strong>Attached Files:</strong></p>
+        <ul>
+          ${Object.entries(data)
+            .filter(([key]) => key.toLowerCase().includes('url'))
+            .map(([key, value]) => `<li><a href="\${value}" target="_blank">${key}</a></li>`)
+            .join('')}
+        </ul>
+        <label>Comment:</label>
+        <textarea id="comment-${requestId}" rows="2" placeholder="Write comment...">${data.comment || ''}</textarea>
+        <div class="actions">
+          <button class="accept" onclick="updateStatus('${col.name}', '${requestId}', 'approved')">Accept</button>
+          <button class="reject" onclick="updateStatus('${col.name}', '${requestId}', 'rejected')">Reject</button>
+          <button class="comment-btn" onclick="saveComment('${col.name}', '${requestId}')">Save Comment</button>
+        </div>
+      `;
+      dashboard.appendChild(card);
+    });
+  }
+}
+
+async function updateStatus(collection, id, status) {
+  const adminId = "admin123"; // ثابت الآن، يمكن تغييره لاحقاً
+  await db.collection(collection).doc(id).update({
+    status,
+    updatedBy: adminId,
+    updatedAt: new Date().toISOString()
+  });
+  alert("Status updated!");
+  loadRequests();
+}
+
+async function saveComment(collection, id) {
+  const comment = document.getElementById('comment-' + id).value;
+  const adminId = "admin123";
+  await db.collection(collection).doc(id).update({
+    comment,
+    updatedBy: adminId,
+    updatedAt: new Date().toISOString()
+  });
+  alert("Comment saved!");
+}
+loadRequests();
+</script>
+
+</body>
+</html>
