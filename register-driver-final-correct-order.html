@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Driver Registration - CMA SEA LAND</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #001c2c;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #07324f;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      padding: 40px;
+    }
+    h2 {
+      text-align: center;
+      color: #00bcd4;
+      margin-bottom: 30px;
+    }
+    label {
+      font-weight: 600;
+      margin-top: 20px;
+      display: block;
+      color: #ffffff;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 5px;
+      font-size: 15px;
+    }
+    .section-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .section-group input {
+      flex: 1;
+    }
+    .btn {
+      background: #00bcd4;
+      color: white;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 30px;
+    }
+    .btn:hover {
+      background: #0099aa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Driver Registration</h2>
+    <form id="driverForm">
+      <label>Full Name</label>
+      <input type="text" name="fullName" required />
+
+      <label>Phone Numbers</label>
+      <div id="phoneNumbersContainer">
+        <div class="section-group">
+          <input type="tel" name="phoneNumbers[]" placeholder="e.g. 501234567" />
+          <button type="button" onclick="addPhone()">+</button>
+        </div>
+      </div>
+
+      <label>Work Type</label>
+      <select name="workType" required>
+        <option value="">-- Select Type --</option>
+        <option value="Local">Local</option>
+        <option value="International">International</option>
+      </select>
+      <label>Truck Type</label>
+      <select name="truckType" required>
+        <option value="">-- Select Truck Type --</option>
+        <option value="flat bed">flat bed</option>
+        <option value="containers">containers</option>
+        <option value="couple 20x2">couple 20x2</option>
+        <option value="box 13.60">box 13.60</option>
+        <option value="box 15 m">box 15 m</option>
+        <option value="box 16 m">box 16 m</option>
+        <option value="box 18 m">box 18 m</option>
+        <option value="reefer">reefer</option>
+        <option value="car carrier">car carrier</option>
+        <option value="lowbed">lowbed</option>
+      </select>
+
+
+      <label>WhatsApp Numbers</label>
+      <div id="whatsappContainer">
+        <div class="section-group">
+          <input type="tel" name="whatsapp[]" placeholder="e.g. 501234567" />
+          <button type="button" onclick="addWhatsapp()">+</button>
+        </div>
+      </div>
+
+      <label>Upload Documents</label>
+      <div class="section-group">
+        <input type="text" value="Driving License" readonly />
+        <input type="file" name="drivingLicense" required />
+        <input type="date" name="drivingLicenseExpiry" required />
+      </div>
+      <div class="section-group">
+        <input type="text" value="Truck Ownership" readonly />
+        <input type="file" name="truckOwnership" required />
+        <input type="date" name="truckOwnershipExpiry" required />
+      </div>
+      <div class="section-group">
+        <input type="text" value="Passport" readonly />
+        <input type="file" name="passport" required />
+        <input type="date" name="passportExpiry" required />
+      </div>
+      <div class="section-group">
+        <input type="text" value="National ID / Residency" readonly />
+        <input type="file" name="nationalId" required />
+        <input type="date" name="nationalIdExpiry" required />
+      </div>
+
+      <button type="submit" class="btn">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    function addPhone() {
+      const container = document.getElementById('phoneNumbersContainer');
+      const group = document.createElement('div');
+      group.className = 'section-group';
+      group.innerHTML = `
+        <input type="tel" name="phoneNumbers[]" placeholder="e.g. 501234567" />
+        <button type="button" onclick="this.parentElement.remove()">−</button>
+      `;
+      container.appendChild(group);
+    }
+
+    function addWhatsapp() {
+      const container = document.getElementById('whatsappContainer');
+      const group = document.createElement('div');
+      group.className = 'section-group';
+      group.innerHTML = `
+        <input type="tel" name="whatsapp[]" placeholder="e.g. 501234567" />
+        <button type="button" onclick="this.parentElement.remove()">−</button>
+      `;
+      container.appendChild(group);
+    }
+
+    document.getElementById('driverForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      alert('Form is ready for Firebase integration.');
+    });
+  </script>
+</body>
+</html>
