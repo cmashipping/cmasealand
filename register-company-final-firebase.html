@@ -48,6 +48,7 @@
     .file-group {
       display: flex;
       gap: 10px;
+      align-items: center;
     }
     .section-group {
       display: flex;
@@ -77,7 +78,73 @@
   <div class="container">
     <h2>Company Registration</h2>
     <form id="companyForm">
-      <!-- Form fields here... (unchanged for brevity) -->
+      <label>Company Name</label>
+      <input type="text" name="companyName" required />
+
+      <label>Activity</label>
+      <select name="activity" required>
+        <option value="">-- Select Activity --</option>
+        <option>Logistics</option>
+        <option>Freight Forwarding</option>
+        <option>Customs Clearance</option>
+        <option>Import/Export</option>
+        <option>Warehousing</option>
+        <option>Distribution</option>
+        <option>Maritime Transport</option>
+        <option>Land Transport</option>
+        <option>Air Cargo</option>
+      </select>
+
+      <label>Country</label>
+      <select name="country" required>
+        <option value="">-- Select Country --</option>
+        <option value="United Arab Emirates">United Arab Emirates</option>
+        <option value="Saudi Arabia">Saudi Arabia</option>
+        <option value="Jordan">Jordan</option>
+        <option value="Lebanon">Lebanon</option>
+        <option value="Syria">Syria</option>
+      </select>
+
+      <label>Phone Number</label>
+      <div class="row">
+        <div>
+          <select name="countryCode" required>
+            <option value="">Code</option>
+            <option value="+971">+971 UAE</option>
+            <option value="+966">+966 KSA</option>
+            <option value="+962">+962 Jordan</option>
+            <option value="+961">+961 Lebanon</option>
+            <option value="+963">+963 Syria</option>
+          </select>
+        </div>
+        <div>
+          <input type="tel" name="phone" placeholder="501234567" required />
+        </div>
+      </div>
+
+      <label>Email</label>
+      <input type="email" name="email" required />
+
+      <label>Trade License</label>
+      <div class="file-group">
+        <input type="file" name="tradeLicense" accept=".pdf,.jpg,.jpeg,.png" required />
+        <input type="date" name="licenseExpiry" required />
+      </div>
+
+      <label>Tax Certificate</label>
+      <div class="file-group">
+        <input type="file" name="taxCertificate" accept=".pdf,.jpg,.jpeg,.png" required />
+        <input type="date" name="taxExpiry" required />
+      </div>
+
+      <label>Internal Departments</label>
+      <div id="departmentsContainer">
+        <div class="section-group">
+          <input type="text" name="departments[]" placeholder="e.g. Finance" />
+          <button type="button" onclick="addDepartment()">+</button>
+        </div>
+      </div>
+
       <button type="submit" class="btn">Submit</button>
     </form>
   </div>
