@@ -68,6 +68,7 @@
     <form id="driverForm">
       <label>Full Name</label>
       <input type="text" name="fullName" required />
+
       <label>Phone Numbers</label>
       <div id="phoneNumbersContainer">
         <div class="section-group">
@@ -75,12 +76,14 @@
           <button type="button" onclick="addPhone()">+</button>
         </div>
       </div>
+
       <label>Work Type</label>
       <select name="workType" required>
         <option value="">-- Select Type --</option>
         <option value="Local">Local</option>
         <option value="International">International</option>
       </select>
+
       <label>Truck Type</label>
       <select name="truckType" required>
         <option value="">-- Select Truck Type --</option>
@@ -95,6 +98,7 @@
         <option value="car carrier">car carrier</option>
         <option value="lowbed">lowbed</option>
       </select>
+
       <label>WhatsApp Numbers</label>
       <div id="whatsappContainer">
         <div class="section-group">
@@ -102,6 +106,7 @@
           <button type="button" onclick="addWhatsapp()">+</button>
         </div>
       </div>
+
       <label>Upload Documents</label>
       <div class="section-group">
         <input type="text" value="Driving License" readonly />
@@ -119,104 +124,124 @@
         <input type="date" name="passportExpiry" required />
       </div>
       <div class="section-group">
-        <input type="text" value="National ID / Residency" readonly />
+        <input type="text" value="National ID" readonly />
         <input type="file" name="nationalId" required />
         <input type="date" name="nationalIdExpiry" required />
       </div>
+
       <button type="submit" class="btn">Submit</button>
     </form>
   </div>
 
-<script>
-function addPhone() {
-  const container = document.getElementById('phoneNumbersContainer');
-  const group = document.createElement('div');
-  group.className = 'section-group';
-  group.innerHTML = `
-    <input type="tel" name="phoneNumbers[]" placeholder="e.g. 501234567" />
-    <button type="button" onclick="this.parentElement.remove()">−</button>
-  `;
-  container.appendChild(group);
-}
-function addWhatsapp() {
-  const container = document.getElementById('whatsappContainer');
-  const group = document.createElement('div');
-  group.className = 'section-group';
-  group.innerHTML = `
-    <input type="tel" name="whatsapp[]" placeholder="e.g. 501234567" />
-    <button type="button" onclick="this.parentElement.remove()">−</button>
-  `;
-  container.appendChild(group);
-}
-</script>
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBN7fyXXqP1287sNU3YooVmvxRoPd4mcho",
-    authDomain: "cma-sea-land-bb064.firebaseapp.com",
-    projectId: "cma-sea-land-bb064",
-    storageBucket: "cma-sea-land-bb064.appspot.com",
-    messagingSenderId: "566265918530",
-    appId: "1:566265918530:web:92bd6b702bad69a293e9db"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const storage = firebase.storage();
-</script>
-
-<script>
-document.getElementById('driverForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
-  const fullName = this.fullName.value;
-  const phoneNumbers = Array.from(document.getElementsByName('phoneNumbers[]')).map(input => input.value).filter(Boolean);
-  const workType = this.workType.value;
-  const truckType = this.truckType.value;
-  const whatsappNumbers = Array.from(document.getElementsByName('whatsapp[]')).map(input => input.value).filter(Boolean);
-
-  const documents = {
-    drivingLicense: { file: this.drivingLicense.files[0], expiry: this.drivingLicenseExpiry.value, label: "Driving License" },
-    truckOwnership: { file: this.truckOwnership.files[0], expiry: this.truckOwnershipExpiry.value, label: "Truck Ownership" },
-    passport: { file: this.passport.files[0], expiry: this.passportExpiry.value, label: "Passport" },
-    nationalId: { file: this.nationalId.files[0], expiry: this.nationalIdExpiry.value, label: "National ID" }
-  };
-
-  const uploadedDocs = {};
-
-  try {
-    for (const key in documents) {
-      const doc = documents[key];
-      const storageRef = storage.ref().child(\`driver_docs/\${fullName}_\${key}_\${Date.now()}\`);
-      const snapshot = await storageRef.put(doc.file);
-      const url = await snapshot.ref.getDownloadURL();
-      uploadedDocs[key] = {
-        name: doc.label,
-        url,
-        expiry: doc.expiry
-      };
+  <script>
+    function addPhone() {
+      const container = document.getElementById('phoneNumbersContainer');
+      const group = document.createElement('div');
+      group.className = 'section-group';
+      group.innerHTML = `
+        <input type="tel" name="phoneNumbers[]" placeholder="e.g. 501234567" />
+        <button type="button" onclick="this.parentElement.remove()">−</button>
+      `;
+      container.appendChild(group);
     }
 
-    await db.collection('driver_requests').add({
-      fullName,
-      phoneNumbers,
-      whatsappNumbers,
-      workType,
-      truckType,
-      documents: uploadedDocs,
-      status: "pending",
-      createdAt: new Date().toISOString()
-    });
+    function addWhatsapp() {
+      const container = document.getElementById('whatsappContainer');
+      const group = document.createElement('div');
+      group.className = 'section-group';
+      group.innerHTML = `
+        <input type="tel" name="whatsapp[]" placeholder="e.g. 501234567" />
+        <button type="button" onclick="this.parentElement.remove()">−</button>
+      `;
+      container.appendChild(group);
+    }
+  </script>
 
-    alert("Driver registration submitted successfully.");
-    this.reset();
-  } catch (error) {
-    console.error(error);
-    alert("Error submitting driver registration.");
-  }
-});
-</script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBN7fyXXqP1287sNU3YooVmvxRoPd4mcho",
+      authDomain: "cma-sea-land-bb064.firebaseapp.com",
+      projectId: "cma-sea-land-bb064",
+      storageBucket: "cma-sea-land-bb064.appspot.com",
+      messagingSenderId: "566265918530",
+      appId: "1:566265918530:web:92bd6b702bad69a293e9db"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+
+  <!-- Cloudinary Upload -->
+  <script>
+    async function uploadToCloudinary(file) {
+      const url = "https://api.cloudinary.com/v1_1/dunikxoxt/auto/upload";
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "unsigned");
+
+      const response = await fetch(url, { method: "POST", body: formData });
+      const data = await response.json();
+      return data.secure_url;
+    }
+
+    document.getElementById('driverForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const fullName = this.fullName.value;
+      const phoneNumbers = Array.from(document.getElementsByName('phoneNumbers[]')).map(el => el.value).filter(Boolean);
+      const whatsappNumbers = Array.from(document.getElementsByName('whatsapp[]')).map(el => el.value).filter(Boolean);
+      const workType = this.workType.value;
+      const truckType = this.truckType.value;
+
+      const docs = {
+        drivingLicense: {
+          file: this.drivingLicense.files[0],
+          expiry: this.drivingLicenseExpiry.value
+        },
+        truckOwnership: {
+          file: this.truckOwnership.files[0],
+          expiry: this.truckOwnershipExpiry.value
+        },
+        passport: {
+          file: this.passport.files[0],
+          expiry: this.passportExpiry.value
+        },
+        nationalId: {
+          file: this.nationalId.files[0],
+          expiry: this.nationalIdExpiry.value
+        }
+      };
+
+      try {
+        const uploadedDocs = {};
+        for (let key in docs) {
+          const fileUrl = await uploadToCloudinary(docs[key].file);
+          uploadedDocs[key] = {
+            url: fileUrl,
+            expiry: docs[key].expiry
+          };
+        }
+
+        await db.collection('driver_requests').add({
+          fullName,
+          phoneNumbers,
+          whatsappNumbers,
+          workType,
+          truckType,
+          documents: uploadedDocs,
+          status: "pending",
+          createdAt: new Date().toISOString()
+        });
+
+        alert("تم إرسال تسجيل السائق بنجاح ✅");
+        this.reset();
+      } catch (err) {
+        console.error(err);
+        alert("❌ حدث خطأ أثناء الإرسال.");
+      }
+    });
+  </script>
 </body>
 </html>
