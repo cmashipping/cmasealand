@@ -87,26 +87,24 @@
         <option>Freight Forwarding</option>
         <option>Customs Clearance</option>
         <option>Import/Export</option>
-        <!-- أضف المزيد حسب الحاجة -->
       </select>
 
       <label>Country</label>
       <select name="country" required>
         <option value="">-- Select Country --</option>
-        <option>United Arab Emirates</option>
-        <option>Saudi Arabia</option>
-        <option>Jordan</option>
-        <option>Lebanon</option>
-        <option>Syria</option>
+        <option value="United Arab Emirates">United Arab Emirates</option>
+        <option value="Saudi Arabia">Saudi Arabia</option>
+        <option value="Jordan">Jordan</option>
+        <option value="Lebanon">Lebanon</option>
       </select>
 
       <label>Phone Number</label>
       <div class="row">
         <div>
           <select name="countryCode" required>
+            <option value="">Code</option>
             <option value="+971">+971 UAE</option>
             <option value="+966">+966 KSA</option>
-            <option value="+962">+962 Jordan</option>
           </select>
         </div>
         <div>
@@ -119,13 +117,13 @@
 
       <label>Trade License</label>
       <div class="file-group">
-        <input type="file" name="tradeLicense" accept=".png,.jpg,.jpeg,.pdf" required />
+        <input type="file" name="tradeLicense" accept=".pdf,.jpg,.jpeg,.png" required />
         <input type="date" name="licenseExpiry" required />
       </div>
 
       <label>Tax Certificate</label>
       <div class="file-group">
-        <input type="file" name="taxCertificate" accept=".png,.jpg,.jpeg,.pdf" required />
+        <input type="file" name="taxCertificate" accept=".pdf,.jpg,.jpeg,.png" required />
         <input type="date" name="taxExpiry" required />
       </div>
 
@@ -141,23 +139,7 @@
     </form>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBN7fyXXqP1287sNU3YooVmvxRoPd4mcho",
-      authDomain: "cma-sea-land-bb064.firebaseapp.com",
-      projectId: "cma-sea-land-bb064",
-      storageBucket: "cma-sea-land-bb064.appspot.com",
-      messagingSenderId: "566265918530",
-      appId: "1:566265918530:web:92bd6b702bad69a293e9db"
-    };
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-
     function addDepartment() {
       const container = document.getElementById('departmentsContainer');
       const group = document.createElement('div');
@@ -168,35 +150,55 @@
       `;
       container.appendChild(group);
     }
+  </script>
 
+  <!-- Firebase SDK (compat mode) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBN7fyXXqP1287sNU3YooVmvxRoPd4mcho",
+      authDomain: "cma-sea-land-bb064.firebaseapp.com",
+      projectId: "cma-sea-land-bb064",
+      storageBucket: "cma-sea-land-bb064.appspot.com",
+      messagingSenderId: "566265918530",
+      appId: "1:566265918530:web:92bd6b702bad69a293e9db"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+  </script>
+
+  <script>
     document.getElementById('companyForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const form = this;
 
-      const companyName = form.companyName.value.trim();
+      const companyName = form.companyName.value;
       const activity = form.activity.value;
       const country = form.country.value;
+      const phone = form.phone.value;
       const countryCode = form.countryCode.value;
-      const phone = form.phone.value.trim();
-      const email = form.email.value.trim();
+      const email = form.email.value;
       const licenseFile = form.tradeLicense.files[0];
       const licenseExpiry = form.licenseExpiry.value;
       const taxFile = form.taxCertificate.files[0];
       const taxExpiry = form.taxExpiry.value;
       const departments = Array.from(document.getElementsByName('departments[]'))
-        .map(input => input.value.trim())
-        .filter(val => val !== "");
+        .map(input => input.value).filter(Boolean);
 
       try {
         const timestamp = Date.now();
-        const licenseRef = storage.ref(`company_docs/${companyName}_license_${timestamp}`);
-        const taxRef = storage.ref(`company_docs/${companyName}_tax_${timestamp}`);
+        const licenseRef = storage.ref().child(`company_docs/${companyName}_license_${timestamp}`);
+        const taxRef = storage.ref().child(`company_docs/${companyName}_tax_${timestamp}`);
 
-        const licenseUpload = await licenseRef.put(licenseFile);
-        const taxUpload = await taxRef.put(taxFile);
+        const licenseSnap = await licenseRef.put(licenseFile);
+        const taxSnap = await taxRef.put(taxFile);
 
-        const licenseURL = await licenseUpload.ref.getDownloadURL();
-        const taxURL = await taxUpload.ref.getDownloadURL();
+        const licenseURL = await licenseSnap.ref.getDownloadURL();
+        const taxURL = await taxSnap.ref.getDownloadURL();
 
         await db.collection('company_requests').add({
           companyName,
@@ -215,8 +217,8 @@
 
         alert("Your company registration has been submitted successfully.");
         form.reset();
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error(err);
         alert("Error submitting the form. Please try again.");
       }
     });
