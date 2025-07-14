@@ -10,6 +10,7 @@
       background: #001c2c;
       margin: 0;
       padding: 0;
+      color: white;
     }
     .container {
       max-width: 800px;
@@ -28,7 +29,6 @@
       font-weight: 600;
       margin-top: 20px;
       display: block;
-      color: #ffffff;
     }
     input, select {
       width: 100%;
@@ -57,9 +57,6 @@
       width: 100%;
       margin-top: 30px;
     }
-    .btn:hover {
-      background: #0099aa;
-    }
   </style>
 </head>
 <body>
@@ -79,24 +76,19 @@
 
       <label>Work Type</label>
       <select name="workType" required>
-        <option value="">-- Select Type --</option>
-        <option value="Local">Local</option>
-        <option value="International">International</option>
+        <option value="">-- Select --</option>
+        <option>Local</option>
+        <option>International</option>
       </select>
 
       <label>Truck Type</label>
       <select name="truckType" required>
-        <option value="">-- Select Truck Type --</option>
-        <option value="flat bed">flat bed</option>
-        <option value="containers">containers</option>
-        <option value="couple 20x2">couple 20x2</option>
-        <option value="box 13.60">box 13.60</option>
-        <option value="box 15 m">box 15 m</option>
-        <option value="box 16 m">box 16 m</option>
-        <option value="box 18 m">box 18 m</option>
-        <option value="reefer">reefer</option>
-        <option value="car carrier">car carrier</option>
-        <option value="lowbed">lowbed</option>
+        <option value="">-- Select --</option>
+        <option>flat bed</option>
+        <option>containers</option>
+        <option>reefer</option>
+        <option>box 13.60</option>
+        <option>lowbed</option>
       </select>
 
       <label>WhatsApp Numbers</label>
@@ -107,24 +99,26 @@
         </div>
       </div>
 
-      <label>Upload Documents</label>
+      <label>Driving License</label>
       <div class="section-group">
-        <input type="text" value="Driving License" readonly />
         <input type="file" name="drivingLicense" required />
         <input type="date" name="drivingLicenseExpiry" required />
       </div>
+
+      <label>Truck Ownership</label>
       <div class="section-group">
-        <input type="text" value="Truck Ownership" readonly />
         <input type="file" name="truckOwnership" required />
         <input type="date" name="truckOwnershipExpiry" required />
       </div>
+
+      <label>Passport</label>
       <div class="section-group">
-        <input type="text" value="Passport" readonly />
         <input type="file" name="passport" required />
         <input type="date" name="passportExpiry" required />
       </div>
+
+      <label>National ID</label>
       <div class="section-group">
-        <input type="text" value="National ID" readonly />
         <input type="file" name="nationalId" required />
         <input type="date" name="nationalIdExpiry" required />
       </div>
@@ -132,30 +126,6 @@
       <button type="submit" class="btn">Submit</button>
     </form>
   </div>
-
-  <script>
-    function addPhone() {
-      const container = document.getElementById('phoneNumbersContainer');
-      const group = document.createElement('div');
-      group.className = 'section-group';
-      group.innerHTML = `
-        <input type="tel" name="phoneNumbers[]" placeholder="e.g. 501234567" />
-        <button type="button" onclick="this.parentElement.remove()">−</button>
-      `;
-      container.appendChild(group);
-    }
-
-    function addWhatsapp() {
-      const container = document.getElementById('whatsappContainer');
-      const group = document.createElement('div');
-      group.className = 'section-group';
-      group.innerHTML = `
-        <input type="tel" name="whatsapp[]" placeholder="e.g. 501234567" />
-        <button type="button" onclick="this.parentElement.remove()">−</button>
-      `;
-      container.appendChild(group);
-    }
-  </script>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -174,57 +144,59 @@
     const db = firebase.firestore();
   </script>
 
-  <!-- Cloudinary Upload -->
   <script>
+    function addPhone() {
+      const container = document.getElementById('phoneNumbersContainer');
+      const group = document.createElement('div');
+      group.className = 'section-group';
+      group.innerHTML = `<input type="tel" name="phoneNumbers[]" /><button type="button" onclick="this.parentElement.remove()">−</button>`;
+      container.appendChild(group);
+    }
+
+    function addWhatsapp() {
+      const container = document.getElementById('whatsappContainer');
+      const group = document.createElement('div');
+      group.className = 'section-group';
+      group.innerHTML = `<input type="tel" name="whatsapp[]" /><button type="button" onclick="this.parentElement.remove()">−</button>`;
+      container.appendChild(group);
+    }
+
     async function uploadToCloudinary(file) {
-      const url = "https://api.cloudinary.com/v1_1/dunikxoxt/auto/upload";
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("upload_preset", "unsigned");
+      formData.append("upload_preset", "unsigned"); // استبدل إن كنت تستخدم preset مخصص
 
-      const response = await fetch(url, { method: "POST", body: formData });
-      const data = await response.json();
+      const res = await fetch("https://api.cloudinary.com/v1_1/dunikxoxt/auto/upload", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
       return data.secure_url;
     }
 
-    document.getElementById('driverForm').addEventListener('submit', async function (e) {
+    document.getElementById("driverForm").addEventListener("submit", async function (e) {
       e.preventDefault();
       const fullName = this.fullName.value;
-      const phoneNumbers = Array.from(document.getElementsByName('phoneNumbers[]')).map(el => el.value).filter(Boolean);
-      const whatsappNumbers = Array.from(document.getElementsByName('whatsapp[]')).map(el => el.value).filter(Boolean);
+      const phoneNumbers = Array.from(document.getElementsByName("phoneNumbers[]")).map(input => input.value).filter(Boolean);
+      const whatsappNumbers = Array.from(document.getElementsByName("whatsapp[]")).map(input => input.value).filter(Boolean);
       const workType = this.workType.value;
       const truckType = this.truckType.value;
 
       const docs = {
-        drivingLicense: {
-          file: this.drivingLicense.files[0],
-          expiry: this.drivingLicenseExpiry.value
-        },
-        truckOwnership: {
-          file: this.truckOwnership.files[0],
-          expiry: this.truckOwnershipExpiry.value
-        },
-        passport: {
-          file: this.passport.files[0],
-          expiry: this.passportExpiry.value
-        },
-        nationalId: {
-          file: this.nationalId.files[0],
-          expiry: this.nationalIdExpiry.value
-        }
+        drivingLicense: { file: this.drivingLicense.files[0], expiry: this.drivingLicenseExpiry.value },
+        truckOwnership: { file: this.truckOwnership.files[0], expiry: this.truckOwnershipExpiry.value },
+        passport: { file: this.passport.files[0], expiry: this.passportExpiry.value },
+        nationalId: { file: this.nationalId.files[0], expiry: this.nationalIdExpiry.value }
       };
 
+      const uploadedDocs = {};
       try {
-        const uploadedDocs = {};
-        for (let key in docs) {
-          const fileUrl = await uploadToCloudinary(docs[key].file);
-          uploadedDocs[key] = {
-            url: fileUrl,
-            expiry: docs[key].expiry
-          };
+        for (const key in docs) {
+          const url = await uploadToCloudinary(docs[key].file);
+          uploadedDocs[key] = { url, expiry: docs[key].expiry };
         }
 
-        await db.collection('driver_requests').add({
+        await db.collection("driver_requests").add({
           fullName,
           phoneNumbers,
           whatsappNumbers,
@@ -235,11 +207,11 @@
           createdAt: new Date().toISOString()
         });
 
-        alert("تم إرسال تسجيل السائق بنجاح ✅");
+        alert("Driver registration submitted successfully.");
         this.reset();
       } catch (err) {
         console.error(err);
-        alert("❌ حدث خطأ أثناء الإرسال.");
+        alert("Failed to register driver.");
       }
     });
   </script>
