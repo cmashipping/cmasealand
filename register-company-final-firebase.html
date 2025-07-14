@@ -48,7 +48,6 @@
     .file-group {
       display: flex;
       gap: 10px;
-      align-items: center;
     }
     .section-group {
       display: flex;
@@ -88,33 +87,26 @@
         <option>Freight Forwarding</option>
         <option>Customs Clearance</option>
         <option>Import/Export</option>
-        <option>Warehousing</option>
-        <option>Distribution</option>
-        <option>Maritime Transport</option>
-        <option>Land Transport</option>
-        <option>Air Cargo</option>
+        <!-- أضف المزيد حسب الحاجة -->
       </select>
 
       <label>Country</label>
       <select name="country" required>
         <option value="">-- Select Country --</option>
-        <option value="United Arab Emirates">United Arab Emirates</option>
-        <option value="Saudi Arabia">Saudi Arabia</option>
-        <option value="Jordan">Jordan</option>
-        <option value="Lebanon">Lebanon</option>
-        <option value="Syria">Syria</option>
+        <option>United Arab Emirates</option>
+        <option>Saudi Arabia</option>
+        <option>Jordan</option>
+        <option>Lebanon</option>
+        <option>Syria</option>
       </select>
 
       <label>Phone Number</label>
       <div class="row">
         <div>
           <select name="countryCode" required>
-            <option value="">Code</option>
             <option value="+971">+971 UAE</option>
             <option value="+966">+966 KSA</option>
             <option value="+962">+962 Jordan</option>
-            <option value="+961">+961 Lebanon</option>
-            <option value="+963">+963 Syria</option>
           </select>
         </div>
         <div>
@@ -127,13 +119,13 @@
 
       <label>Trade License</label>
       <div class="file-group">
-        <input type="file" name="tradeLicense" accept=".pdf,.jpg,.jpeg,.png" required />
+        <input type="file" name="tradeLicense" accept=".png,.jpg,.jpeg,.pdf" required />
         <input type="date" name="licenseExpiry" required />
       </div>
 
       <label>Tax Certificate</label>
       <div class="file-group">
-        <input type="file" name="taxCertificate" accept=".pdf,.jpg,.jpeg,.png" required />
+        <input type="file" name="taxCertificate" accept=".png,.jpg,.jpeg,.pdf" required />
         <input type="date" name="taxExpiry" required />
       </div>
 
@@ -148,19 +140,6 @@
       <button type="submit" class="btn">Submit</button>
     </form>
   </div>
-
-  <script>
-    function addDepartment() {
-      const container = document.getElementById('departmentsContainer');
-      const group = document.createElement('div');
-      group.className = 'section-group';
-      group.innerHTML = `
-        <input type="text" name="departments[]" placeholder="e.g. Operations" />
-        <button type="button" onclick="this.parentElement.remove()">−</button>
-      `;
-      container.appendChild(group);
-    }
-  </script>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
@@ -178,35 +157,46 @@
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const storage = firebase.storage();
-  </script>
 
-  <script>
+    function addDepartment() {
+      const container = document.getElementById('departmentsContainer');
+      const group = document.createElement('div');
+      group.className = 'section-group';
+      group.innerHTML = `
+        <input type="text" name="departments[]" placeholder="e.g. Operations" />
+        <button type="button" onclick="this.parentElement.remove()">−</button>
+      `;
+      container.appendChild(group);
+    }
+
     document.getElementById('companyForm').addEventListener('submit', async function (e) {
       e.preventDefault();
-
       const form = this;
-      const companyName = form.companyName.value;
+
+      const companyName = form.companyName.value.trim();
       const activity = form.activity.value;
       const country = form.country.value;
-      const phone = form.phone.value;
       const countryCode = form.countryCode.value;
-      const email = form.email.value;
+      const phone = form.phone.value.trim();
+      const email = form.email.value.trim();
       const licenseFile = form.tradeLicense.files[0];
       const licenseExpiry = form.licenseExpiry.value;
       const taxFile = form.taxCertificate.files[0];
       const taxExpiry = form.taxExpiry.value;
-      const departments = Array.from(document.getElementsByName('departments[]')).map(input => input.value).filter(Boolean);
+      const departments = Array.from(document.getElementsByName('departments[]'))
+        .map(input => input.value.trim())
+        .filter(val => val !== "");
 
       try {
         const timestamp = Date.now();
-        const licenseRef = storage.ref().child(`company_docs/${companyName}_license_${timestamp}`);
-        const taxRef = storage.ref().child(`company_docs/${companyName}_tax_${timestamp}`);
+        const licenseRef = storage.ref(`company_docs/${companyName}_license_${timestamp}`);
+        const taxRef = storage.ref(`company_docs/${companyName}_tax_${timestamp}`);
 
-        const licenseSnap = await licenseRef.put(licenseFile);
-        const taxSnap = await taxRef.put(taxFile);
+        const licenseUpload = await licenseRef.put(licenseFile);
+        const taxUpload = await taxRef.put(taxFile);
 
-        const licenseURL = await licenseSnap.ref.getDownloadURL();
-        const taxURL = await taxSnap.ref.getDownloadURL();
+        const licenseURL = await licenseUpload.ref.getDownloadURL();
+        const taxURL = await taxUpload.ref.getDownloadURL();
 
         await db.collection('company_requests').add({
           companyName,
@@ -225,8 +215,8 @@
 
         alert("Your company registration has been submitted successfully.");
         form.reset();
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
         alert("Error submitting the form. Please try again.");
       }
     });
