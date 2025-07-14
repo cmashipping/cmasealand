@@ -152,11 +152,9 @@
     }
   </script>
 
-  <!-- Firebase SDK (compat mode) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBN7fyXXqP1287sNU3YooVmvxRoPd4mcho",
@@ -168,9 +166,9 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const storage = firebase.storage();
   </script>
 
+  <!-- Cloudinary Upload + Firestore Save -->
   <script>
     document.getElementById('companyForm').addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -189,16 +187,21 @@
       const departments = Array.from(document.getElementsByName('departments[]'))
         .map(input => input.value).filter(Boolean);
 
+      async function uploadToCloudinary(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'unsigned');
+        const res = await fetch('https://api.cloudinary.com/v1_1/dunikxoxt/auto/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        return data.secure_url;
+      }
+
       try {
-        const timestamp = Date.now();
-        const licenseRef = storage.ref().child(`company_docs/${companyName}_license_${timestamp}`);
-        const taxRef = storage.ref().child(`company_docs/${companyName}_tax_${timestamp}`);
-
-        const licenseSnap = await licenseRef.put(licenseFile);
-        const taxSnap = await taxRef.put(taxFile);
-
-        const licenseURL = await licenseSnap.ref.getDownloadURL();
-        const taxURL = await taxSnap.ref.getDownloadURL();
+        const licenseURL = await uploadToCloudinary(licenseFile);
+        const taxURL = await uploadToCloudinary(taxFile);
 
         await db.collection('company_requests').add({
           companyName,
@@ -215,11 +218,11 @@
           createdAt: new Date().toISOString()
         });
 
-        alert("Your company registration has been submitted successfully.");
+        alert("✅ تم إرسال تسجيل الشركة بنجاح.");
         form.reset();
       } catch (err) {
         console.error(err);
-        alert("Error submitting the form. Please try again.");
+        alert("❌ حدث خطأ أثناء الإرسال.");
       }
     });
   </script>
