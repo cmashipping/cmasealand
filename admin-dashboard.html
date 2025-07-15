@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Dashboard - CMA SEA LAND</title>
   <style>
     body {
@@ -80,58 +80,20 @@
     <div id="drivers" class="tab-content" style="display:none;"></div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <!-- Firebase SDK compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBN7fyXXqP1287sNU3YooVmvxRoPd4mcho",
       authDomain: "cma-sea-land-bb064.firebaseapp.com",
-      projectId: "cma-sea-land-bb064",
+      projectId: "cma-sea-land-bb064"
     };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    async function loadData(type) {
-      const container = document.getElementById(type);
-      container.innerHTML = '';
-      const col = collection(db, `${type}_requests`);
-      const snap = await getDocs(col);
-
-      snap.forEach(doc => {
-        const data = doc.data();
-        let html = `<div class="card">
-          <h3>${data.fullName || data.companyName || data.providerName}</h3>
-          <p><strong>Activity:</strong> ${data.activity}</p>
-          <p><strong>Phone:</strong> ${data.phone || data.phoneNumbers?.join(', ')}</p>
-          <p><strong>Email:</strong> ${data.email || '—'}</p>
-          <p><strong>Country:</strong> ${data.country || '—'}</p>
-        `;
-        if (data.documents) {
-          for (let key in data.documents) {
-            html += `<p><strong>${data.documents[key].name}:</strong> 
-              <a href="${data.documents[key].url}" target="_blank">View</a>, Exp: ${data.documents[key].expiry}
-            </p>`;
-          }
-        } else {
-          html += `<p><strong>License:</strong> <a href="${data.licenseURL}" target="_blank">View</a> (exp: ${data.licenseExpiry})</p>`;
-          html += `<p><strong>Tax:</strong> <a href="${data.taxURL}" target="_blank">View</a> (exp: ${data.taxExpiry})</p>`;
-        }
-        html += `
-          <p><strong>Status:</strong> ${data.status}</p>
-          <p><strong>Date:</strong> ${data.createdAt}</p>
-          <textarea placeholder="Comment if any... (e.g. missing docs)"></textarea>
-          <div class="btn-group">
-            <button class="btn-accept">Accept</button>
-            <button class="btn-reject">Reject</button>
-          </div>
-        </div>`;
-
-        container.innerHTML += html;
-      });
-    }
-
+    const tabs = ['companies', 'providers', 'drivers'];
     function showTab(tab) {
       document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(div => div.style.display = 'none');
@@ -139,9 +101,52 @@
       document.getElementById(tab).style.display = 'block';
     }
 
-    loadData('companies');
-    loadData('providers');
-    loadData('drivers');
+    function renderCard(type, data) {
+      const name = data.fullName || data.companyName || data.providerName;
+      let html = `<div class="card">
+        <h3>${name}</h3>
+        <p><strong>Activity:</strong> ${data.activity || ''}</p>
+        <p><strong>Phone:</strong> ${data.phone || (data.phoneNumbers?.join(', ') || '')}</p>
+        <p><strong>Email:</strong> ${data.email || ''}</p>
+        <p><strong>Country:</strong> ${data.country || ''}</p>`;
+
+      if (data.documents) {
+        for (const key in data.documents) {
+          const doc = data.documents[key];
+          html += `<p><strong>${doc.name}:</strong> <a href="${doc.url}" target="_blank">View</a> (Exp: ${doc.expiry})</p>`;
+        }
+      } else {
+        html += `<p><strong>Trade License:</strong> <a href="${data.licenseURL}" target="_blank">View</a> (Exp: ${data.licenseExpiry})</p>`;
+        html += `<p><strong>Tax Certificate:</strong> <a href="${data.taxURL}" target="_blank">View</a> (Exp: ${data.taxExpiry})</p>`;
+      }
+
+      html += `
+        <p><strong>Status:</strong> ${data.status}</p>
+        <p><strong>Date:</strong> ${data.createdAt}</p>
+        <textarea placeholder="Comment (e.g. missing documents)"></textarea>
+        <div class="btn-group">
+          <button class="btn-accept">Accept</button>
+          <button class="btn-reject">Reject</button>
+        </div>
+      </div>`;
+      return html;
+    }
+
+    async function loadData(type) {
+      const container = document.getElementById(type);
+      container.innerHTML = '';
+      try {
+        const snapshot = await db.collection(`${type}_requests`).get();
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          container.innerHTML += renderCard(type, data);
+        });
+      } catch (err) {
+        container.innerHTML = `<p style="color:red;">Error loading ${type}</p>`;
+      }
+    }
+
+    tabs.forEach(loadData);
   </script>
 </body>
 </html>
