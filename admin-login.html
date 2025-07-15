@@ -88,32 +88,39 @@
     const db = firebase.firestore();
   </script>
 
-  <script>
-    document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
+<script>
+  document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
 
-      try {
-        const query = await db.collection("admins")
-          .where("username", "==", username)
-          .where("password", "==", password)
-          .get();
+    try {
+      const snapshot = await db.collection("admins").get();
+      let valid = false;
+      let adminId = "";
 
-        if (!query.empty) {
-          const admin = query.docs[0].data();
-          localStorage.setItem("adminId", admin.adminId || username);
-          alert("Login successful!");
-          window.location.href = "admin-dashboard-firebase.html";
-        } else {
-          alert("Invalid username or password.");
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (data.username === username && data.password === password) {
+          valid = true;
+          adminId = data.adminId || username;
         }
-      } catch (err) {
-        console.error(err);
-        alert("Login failed. Please try again.");
+      });
+
+      if (valid) {
+        localStorage.setItem("adminId", adminId);
+        alert("Login successful!");
+        window.location.href = "admin-dashboard.html";
+      } else {
+        alert("Invalid username or password.");
       }
-    });
-  </script>
+    } catch (err) {
+      console.error(err);
+      alert("Login failed. Please try again.");
+    }
+  });
+</script>
+
 </body>
 </html>
