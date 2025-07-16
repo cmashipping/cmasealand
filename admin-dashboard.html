@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard - CMA SEA LAND</title>
   <style>
     body {
@@ -80,7 +80,6 @@
     <div id="drivers" class="tab-content" style="display:none;"></div>
   </div>
 
-  <!-- Firebase SDK compat -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
@@ -111,44 +110,42 @@
         <p><strong>Email:</strong> ${data.email || ''}</p>
         <p><strong>Country:</strong> ${data.country || ''}</p>`;
 
-      if (data.documents && typeof data.documents === 'object') {
+      if (data.documents) {
         for (const key in data.documents) {
           const doc = data.documents[key];
-          html += `<p><strong>${doc.name || key}:</strong> <a href="${doc.url}" target="_blank">View</a> (Exp: ${doc.expiry || 'N/A'})</p>`;
+          html += `<p><strong>${doc.name}:</strong> <a href="${doc.url}" target="_blank">View</a> (Exp: ${doc.expiry})</p>`;
         }
       } else {
-        if (data.licenseURL)
-          html += `<p><strong>Trade License:</strong> <a href="${data.licenseURL}" target="_blank">View</a> (Exp: ${data.licenseExpiry || 'N/A'})</p>`;
-        if (data.taxURL)
-          html += `<p><strong>Tax Certificate:</strong> <a href="${data.taxURL}" target="_blank">View</a> (Exp: ${data.taxExpiry || 'N/A'})</p>`;
-        if (data.idURL)
-          html += `<p><strong>ID Document:</strong> <a href="${data.idURL}" target="_blank">View</a> (Exp: ${data.idExpiry || 'N/A'})</p>`;
+        html += `<p><strong>Trade License:</strong> <a href="${data.licenseURL}" target="_blank">View</a> (Exp: ${data.licenseExpiry})</p>`;
+        html += `<p><strong>Tax Certificate:</strong> <a href="${data.taxURL}" target="_blank">View</a> (Exp: ${data.taxExpiry})</p>`;
       }
 
       html += `
-        <p><strong>Status:</strong> ${data.status || 'pending'}</p>
-        <p><strong>Date:</strong> ${data.createdAt || ''}</p>
+        <p><strong>Status:</strong> ${data.status}</p>
+        <p><strong>Date:</strong> ${data.createdAt}</p>
         <textarea placeholder="Comment (e.g. missing documents)"></textarea>
         <div class="btn-group">
           <button class="btn-accept">Accept</button>
           <button class="btn-reject">Reject</button>
         </div>
       </div>`;
+
       return html;
     }
 
     async function loadData(type) {
       const container = document.getElementById(type);
-      container.innerHTML = '';
+      container.innerHTML = '<p>Loading...</p>';
       try {
         const snapshot = await db.collection(`${type}_requests`).get();
+        container.innerHTML = '';
         snapshot.forEach(doc => {
           const data = doc.data();
           container.innerHTML += renderCard(type, data);
         });
       } catch (err) {
-        console.error("Error loading data:", err);
-        container.innerHTML = `<p style="color:red;">Error loading ${type} data.</p>`;
+        console.error("Error loading", type, err);
+        container.innerHTML = `<p style="color:red;">Error loading ${type}</p>`;
       }
     }
 
