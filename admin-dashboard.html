@@ -17,9 +17,9 @@
       justify-content: center;
       background: #07324f;
       padding: 10px;
+      gap: 10px;
     }
     .tab {
-      margin: 0 10px;
       padding: 10px 20px;
       background: #00bcd4;
       border: none;
@@ -50,6 +50,9 @@
       border-radius: 6px;
       font-size: 14px;
     }
+    .btn-group {
+      margin-top: 10px;
+    }
     .btn-group button {
       padding: 8px 16px;
       border-radius: 6px;
@@ -65,19 +68,48 @@
       background-color: #dc3545;
       color: white;
     }
+    .status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .status.pending {
+      background: orange;
+    }
+    .status.accepted {
+      background: green;
+    }
+    .status.rejected {
+      background: red;
+    }
+    .refresh-btn {
+      background: #555;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="tabs">
-    <button class="tab active" onclick="showTab('companies')">Companies</button>
-    <button class="tab" onclick="showTab('providers')">Providers</button>
-    <button class="tab" onclick="showTab('drivers')">Drivers</button>
+    <button class="tab active" onclick="showTab('company')">Companies</button>
+    <button class="tab" onclick="showTab('provider')">Providers</button>
+    <button class="tab" onclick="showTab('driver')">Drivers</button>
   </div>
 
   <div class="container">
-    <div id="companies" class="tab-content"></div>
-    <div id="providers" class="tab-content" style="display:none;"></div>
-    <div id="drivers" class="tab-content" style="display:none;"></div>
+    <div id="company" class="tab-content">
+      <button class="refresh-btn" onclick="loadData('company')">⟳ Refresh</button>
+    </div>
+    <div id="provider" class="tab-content" style="display:none;">
+      <button class="refresh-btn" onclick="loadData('provider')">⟳ Refresh</button>
+    </div>
+    <div id="driver" class="tab-content" style="display:none;">
+      <button class="refresh-btn" onclick="loadData('driver')">⟳ Refresh</button>
+    </div>
   </div>
 
   <!-- Firebase SDK compat -->
@@ -93,7 +125,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const tabs = ['companies', 'providers', 'drivers'];
+    const tabs = ['company', 'provider', 'driver'];
+
     function showTab(tab) {
       document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(div => div.style.display = 'none');
@@ -101,7 +134,7 @@
       document.getElementById(tab).style.display = 'block';
     }
 
-    function renderCard(type, data) {
+    function renderCard(type, id, data) {
       const name = data.fullName || data.companyName || data.providerName || 'Unknown';
       const d = data.departments || {};
 
@@ -112,42 +145,56 @@
         <p><strong>Email:</strong> ${data.email || d.email || ''}</p>
         <p><strong>Country:</strong> ${data.country || ''}</p>`;
 
-      if (data.documents) {
-        for (const key in data.documents) {
-          const doc = data.documents[key];
-          html += `<p><strong>${doc.name}:</strong> <a href="${doc.url}" target="_blank">View</a> (Exp: ${doc.expiry})</p>`;
-        }
-      } else {
-        html += `<p><strong>Trade License:</strong> <a href="${data.licenseURL || d.licenseURL}" target="_blank">View</a> (Exp: ${data.licenseExpiry || d.licenseExpiry || ''})</p>`;
-        html += `<p><strong>Tax Certificate:</strong> <a href="${data.taxURL || d.taxURL}" target="_blank">View</a> (Exp: ${data.taxExpiry || d.taxExpiry || ''})</p>`;
-      }
+      html += `<p><strong>Trade License:</strong> <a href="${data.licenseURL || d.licenseURL}" target="_blank">View</a> (Exp: ${data.licenseExpiry || d.licenseExpiry || ''})</p>`;
+      html += `<p><strong>Tax Certificate:</strong> <a href="${data.taxURL || d.taxURL}" target="_blank">View</a> (Exp: ${data.taxExpiry || d.taxExpiry || ''})</p>`;
 
       html += `
-        <p><strong>Status:</strong> ${data.status || ''}</p>
+        <p><strong>Status:</strong> <span class="status ${data.status}">${data.status}</span></p>
         <p><strong>Date:</strong> ${data.createdAt || ''}</p>
-        <textarea placeholder="Comment (e.g. missing documents)"></textarea>
+        <textarea id="comment-${id}" placeholder="Comment (e.g. missing documents)">${data.comment || ''}</textarea>
         <div class="btn-group">
-          <button class="btn-accept">Accept</button>
-          <button class="btn-reject">Reject</button>
+          <button class="btn-accept" onclick="updateStatus('${type}', '${id}', 'accepted')">Accept</button>
+          <button class="btn-reject" onclick="updateStatus('${type}', '${id}', 'rejected')">Reject</button>
         </div>
       </div>`;
       return html;
     }
 
+    async function updateStatus(type, id, status) {
+      const comment = document.getElementById(`comment-${id}`).value;
+      try {
+        await db.collection(`${type}_requests`).doc(id).update({
+          status: status,
+          comment: comment
+        });
+        alert("Status updated!");
+        loadData(type);
+      } catch (err) {
+        alert("Error updating status: " + err.message);
+      }
+    }
+
     async function loadData(type) {
       const container = document.getElementById(type);
+      const oldRefresh = container.querySelector('.refresh-btn');
       container.innerHTML = '';
+      container.appendChild(oldRefresh); // keep refresh button
       try {
         const snapshot = await db.collection(`${type}_requests`).get();
+        if (snapshot.empty) {
+          container.innerHTML += `<p>No ${type} requests found.</p>`;
+          return;
+        }
         snapshot.forEach(doc => {
           const data = doc.data();
-          container.innerHTML += renderCard(type, data);
+          container.innerHTML += renderCard(type, doc.id, data);
         });
       } catch (err) {
         container.innerHTML = `<p style="color:red;">Error loading ${type}</p>`;
       }
     }
 
+    // Load all data on load
     tabs.forEach(loadData);
   </script>
 </body>
