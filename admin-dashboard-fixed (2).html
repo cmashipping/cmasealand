@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - CMA SEA LAND</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    window.onload = function() {
+      emailjs.init("MM0ydVptGpFqoHOrL");
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #001c2c;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      background: #07324f;
+      padding: 10px;
+      gap: 10px;
+    }
+    .tab {
+      padding: 10px 20px;
+      background: #00bcd4;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: #0099aa;
+    }
+    .container {
+      padding: 20px;
+    }
+    .card {
+      background: #07324f;
+      margin: 20px 0;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    a {
+      color: #00bcd4;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .btn-group {
+      margin-top: 10px;
+    }
+    .btn-group button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      margin-right: 10px;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-accept {
+      background-color: #28a745;
+      color: white;
+    }
+    .btn-reject {
+      background-color: #dc3545;
+      color: white;
+    }
+    .status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .status.pending {
+      background: orange;
+    }
+    .status.accepted {
+      background: green;
+    }
+    .status.rejected {
+      background: red;
+    }
+    .refresh-btn {
+      background: #555;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('company')">Companies</button>
+    <button class="tab" onclick="showTab('provider')">Providers</button>
+    <button class="tab" onclick="showTab('driver')">Drivers</button>
+  </div>
+
+  <div class="container">
+    <div id="company" class="tab-content">
+      <button class="refresh-btn" onclick="loadData('company')">⟳ Refresh</button>
+    </div>
+    <div id="provider" class="tab-content" style="display:none;">
+      <button class="refresh-btn" onclick="loadData('provider')">⟳ Refresh</button>
+    </div>
+    <div id="driver" class="tab-content" style="display:none;">
+      <button class="refresh-btn" onclick="loadData('driver')">⟳ Refresh</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBN7fyXXqP1287sNU3YooVmvxRoPd4mcho",
+      authDomain: "cma-sea-land-bb064.firebaseapp.com",
+      projectId: "cma-sea-land-bb064"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const tabs = ['company', 'provider', 'driver'];
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(div => div.style.display = 'none');
+      document.querySelector(`.tab[onclick*='${tab}']`).classList.add('active');
+      document.getElementById(tab).style.display = 'block';
+    }
+
+    function renderCard(type, id, data) {
+      const name = data.fullName || data.companyName || data.providerName || 'Unknown';
+      const d = data.departments || {};
+
+      let html = `<div class="card">
+        <h3>${name}</h3>
+        <p><strong>Activity:</strong> ${data.activity || ''}</p>
+        <p><strong>Phone:</strong> ${data.phone || d.phone || ''}</p>
+        <p><strong>Email:</strong> ${data.email || d.email || ''}</p>
+        <p><strong>Country:</strong> ${data.country || ''}</p>`;
+
+      html += `<p><strong>Trade License:</strong> <a href="${data.licenseURL || d.licenseURL}" target="_blank">View</a> (Exp: ${data.licenseExpiry || d.licenseExpiry || ''})</p>`;
+      html += `<p><strong>Tax Certificate:</strong> <a href="${data.taxURL || d.taxURL}" target="_blank">View</a> (Exp: ${data.taxExpiry || d.taxExpiry || ''})</p>`;
+
+      html += `
+        <p><strong>Status:</strong> <span class="status ${data.status}">${data.status}</span></p>
+        <p><strong>Date:</strong> ${data.createdAt || ''}</p>
+        <textarea id="comment-${id}" placeholder="Comment (e.g. missing documents)">${data.comment || ''}</textarea>
+        <div class="btn-group">
+          <button class="btn-accept" onclick="updateStatus('${type}', '${id}', 'accepted')">Accept</button>
+          <button class="btn-reject" onclick="updateStatus('${type}', '${id}', 'rejected')">Reject</button>
+        </div>
+      </div>`;
+      return html;
+    }
+
+    async function updateStatus(type, id, status) {
+      const comment = document.getElementById(`comment-${id}`).value;
+
+      try {
+        const docRef = db.collection(`${type}_requests`).doc(id);
+        const docSnapshot = await docRef.get();
+
+        if (!docSnapshot.exists) {
+          alert("❌ Request not found.");
+          return;
+        }
+
+        const data = docSnapshot.data();
+        const email = data.email || (data.departments && data.departments.email) || '';
+
+        if (!email) {
+          alert("❌ No email found for this request.");
+          return;
+        }
+
+        await docRef.update({ status: status, comment: comment });
+
+        const templateParams = {
+          status: status,
+          comment: comment,
+          to_email: email
+        };
+
+        await emailjs.send("service_jm4rubp", "template_xdowu9b", templateParams);
+        alert("✅ Status updated and email sent!");
+        loadData(type);
+      } catch (err) {
+        console.error(err);
+        alert("❌ Error: " + (err.text || err.message));
+      }
+    }
+
+    async function loadData(type) {
+      const container = document.getElementById(type);
+      const oldRefresh = container.querySelector('.refresh-btn');
+      container.innerHTML = '';
+      container.appendChild(oldRefresh);
+      try {
+        const snapshot = await db.collection(`${type}_requests`).get();
+        if (snapshot.empty) {
+          container.innerHTML += `<p>No ${type} requests found.</p>`;
+          return;
+        }
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          container.innerHTML += renderCard(type, doc.id, data);
+        });
+      } catch (err) {
+        container.innerHTML = `<p style="color:red;">Error loading ${type}</p>`;
+      }
+    }
+
+    tabs.forEach(loadData);
+  </script>
+</body>
+</html>
