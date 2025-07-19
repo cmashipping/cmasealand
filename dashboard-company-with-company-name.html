@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Company Dashboard - CMA SEA LAND</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+    }
+    header {
+      background-color: #003366;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      position: relative;
+    }
+    #companyName {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 16px;
+      font-weight: normal;
+      color: #00cfff;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 40px;
+    }
+    .card {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.2s;
+      text-decoration: none;
+      color: #003366;
+      font-weight: bold;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    CMA SEA LAND - Company Dashboard
+    <div id="companyName">Company Name</div>
+  </header>
+  <div class="container">
+    <a class="card" href="freight-quote-cmasealand.html">Request a Quote</a>
+    <a class="card" href="track-shipment.html">Track Shipment</a>
+    <a class="card" href="add-employee.html">Add Employee</a>
+    <a class="card" href="company-profile.html">Company Profile</a>
+    <a class="card" href="shipment-dashboard.html">Shipment Dashboard</a>
+    <a class="card" href="container-dashboard.html">Container Dashboard</a>
+    <a class="card" href="documents-dashboard.html">Documents Dashboard</a>
+    <a class="card" href="finance-dashboard.html">Finance Dashboard</a>
+    <a class="card" href="add-parties.html">Add Parties</a>
+  </div>
+
+  <script>
+    const company = JSON.parse(localStorage.getItem("companyInfo"));
+    if (company && company.name) {
+      document.getElementById("companyName").textContent = company.name;
+    }
+  </script>
+</body>
+</html>
