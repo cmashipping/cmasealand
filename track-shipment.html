@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Track Shipment</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #eef2f6;
+      margin: 0;
+      padding: 40px;
+    }
+    h2 {
+      color: #003366;
+    }
+    .tracking-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+    .step {
+      padding: 15px;
+      border-left: 4px solid #00bcd4;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+    }
+    .step.completed {
+      border-color: #4caf50;
+      background-color: #e8f5e9;
+    }
+    .step h4 {
+      margin: 0 0 6px 0;
+      color: #003366;
+    }
+    .step p {
+      margin: 0;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h2>Track Shipment - SHP-10342</h2>
+
+  <div class="tracking-box">
+    <div class="step completed">
+      <h4>Booking Confirmed</h4>
+      <p>2025-07-10 09:00</p>
+    </div>
+    <div class="step completed">
+      <h4>Container Stuffed</h4>
+      <p>2025-07-13 11:30</p>
+    </div>
+    <div class="step completed">
+      <h4>Gate In - Jebel Ali Port</h4>
+      <p>2025-07-14 16:45</p>
+    </div>
+    <div class="step completed">
+      <h4>Loaded on Vessel - CMA CGM COLUMBA</h4>
+      <p>2025-07-15 22:00</p>
+    </div>
+    <div class="step">
+      <h4>In Transit</h4>
+      <p>Estimated Arrival: 2025-10-07</p>
+    </div>
+    <div class="step">
+      <h4>Discharged - Douala Port</h4>
+      <p>Pending</p>
+    </div>
+    <div class="step">
+      <h4>Delivery to Consignee</h4>
+      <p>Pending</p>
+    </div>
+  </div>
+</body>
+</html>
