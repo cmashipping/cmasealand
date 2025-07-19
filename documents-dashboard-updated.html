@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documents Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f2f6fa;
+      margin: 0;
+      padding: 40px;
+    }
+    h2 {
+      color: #003366;
+    }
+    .documents-table {
+      width: 100%;
+      background: #fff;
+      border-collapse: collapse;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #003366;
+      color: #fff;
+    }
+    a {
+      color: #0077cc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Documents Dashboard</h2>
+  <table class="documents-table">
+    <thead>
+      <tr>
+        <th>Document Type</th>
+        <th>Reference</th>
+        <th>Status</th>
+        <th>Date & Time</th>
+        <th>Added By</th>
+        <th>Download</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Bill of Lading (B/L)</td>
+        <td>DXB0964112A</td>
+        <td>Draft</td>
+        <td>2025-07-19 08:30</td>
+        <td>Admin-Afnan</td>
+        <td><a href="#">Download</a></td>
+      </tr>
+      <tr>
+        <td>Invoice</td>
+        <td>INV-47291</td>
+        <td>Issued</td>
+        <td>2025-07-18 17:00</td>
+        <td>Finance-User</td>
+        <td><a href="#">Download</a></td>
+      </tr>
+      <tr>
+        <td>Customs Clearance</td>
+        <td>DOC-CL0092</td>
+        <td>Approved</td>
+        <td>2025-07-17 14:45</td>
+        <td>Customs-Agent</td>
+        <td><a href="#">Download</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
