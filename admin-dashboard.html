@@ -134,7 +134,7 @@
     function renderCard(type, id, data) {
       const name = data.fullName || data.companyName || data.providerName || 'Unknown';
       const d = data.departments || {};
-      let html = `<div class="card">
+      return `<div class="card">
         <h3>${name}</h3>
         <p><strong>Activity:</strong> ${data.activity || ''}</p>
         <p><strong>Phone:</strong> ${data.phone || d.phone || ''}</p>
@@ -150,12 +150,11 @@
           <button class="btn-reject" onclick="updateStatus('${type}', '${id}', 'rejected')">Reject</button>
         </div>
       </div>`;
-      return html;
     }
 
     async function sendEmailViaServer(email, status, comment) {
       try {
-        const res = await fetch("https://cma-email-server-ou6w.vercel.app/api/send", {
+        const res = await fetch("https://cma-email-server-lmc9.vercel.app/api/send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
