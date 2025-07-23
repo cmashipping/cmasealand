@@ -73,15 +73,9 @@
       border-radius: 4px;
       font-weight: bold;
     }
-    .status.pending {
-      background: orange;
-    }
-    .status.accepted {
-      background: green;
-    }
-    .status.rejected {
-      background: red;
-    }
+    .status.pending { background: orange; }
+    .status.accepted { background: green; }
+    .status.rejected { background: red; }
     .refresh-btn {
       background: #555;
       border: none;
@@ -94,6 +88,7 @@
   </style>
 </head>
 <body>
+
   <div class="tabs">
     <button class="tab active" onclick="showTab('company')">Companies</button>
     <button class="tab" onclick="showTab('provider')">Providers</button>
@@ -135,28 +130,27 @@
       const name = data.fullName || data.companyName || data.providerName || 'Unknown';
       const d = data.departments || {};
       return `
-        <div class="card">
-          <h3>${name}</h3>
-          <p><strong>Activity:</strong> ${data.activity || ''}</p>
-          <p><strong>Phone:</strong> ${data.phone || d.phone || ''}</p>
-          <p><strong>Email:</strong> ${data.email || d.email || ''}</p>
-          <p><strong>Country:</strong> ${data.country || ''}</p>
-          <p><strong>Trade License:</strong> <a href="${data.licenseURL || d.licenseURL}" target="_blank">View</a> (Exp: ${data.licenseExpiry || d.licenseExpiry || ''})</p>
-          <p><strong>Tax Certificate:</strong> <a href="${data.taxURL || d.taxURL}" target="_blank">View</a> (Exp: ${data.taxExpiry || d.taxExpiry || ''})</p>
-          <p><strong>Status:</strong> <span class="status ${data.status}">${data.status}</span></p>
-          <p><strong>Date:</strong> ${data.createdAt || ''}</p>
-          <textarea id="comment-${id}" placeholder="Comment (e.g. missing documents)">${data.comment || ''}</textarea>
-          <div class="btn-group">
-            <button class="btn-accept" onclick="updateStatus('${type}', '${id}', 'accepted')">Accept</button>
-            <button class="btn-reject" onclick="updateStatus('${type}', '${id}', 'rejected')">Reject</button>
-          </div>
+      <div class="card">
+        <h3>${name}</h3>
+        <p><strong>Activity:</strong> ${data.activity || ''}</p>
+        <p><strong>Phone:</strong> ${data.phone || d.phone || ''}</p>
+        <p><strong>Email:</strong> ${data.email || d.email || ''}</p>
+        <p><strong>Country:</strong> ${data.country || ''}</p>
+        <p><strong>Trade License:</strong> <a href="${data.licenseURL || d.licenseURL}" target="_blank">View</a> (Exp: ${data.licenseExpiry || d.licenseExpiry || ''})</p>
+        <p><strong>Tax Certificate:</strong> <a href="${data.taxURL || d.taxURL}" target="_blank">View</a> (Exp: ${data.taxExpiry || d.taxExpiry || ''})</p>
+        <p><strong>Status:</strong> <span class="status ${data.status}">${data.status}</span></p>
+        <p><strong>Date:</strong> ${data.createdAt || ''}</p>
+        <textarea id="comment-${id}" placeholder="Comment (e.g. missing documents)">${data.comment || ''}</textarea>
+        <div class="btn-group">
+          <button class="btn-accept" onclick="updateStatus('${type}', '${id}', 'accepted')">Accept</button>
+          <button class="btn-reject" onclick="updateStatus('${type}', '${id}', 'rejected')">Reject</button>
         </div>
-      `;
+      </div>`;
     }
 
     async function sendEmailViaServer(email, status, comment) {
       try {
-        const res = await fetch("https://cma-email-server-6uos.vercel.app/api/send", {
+        const res = await fetch("https://cma-email-server-api.vercel.app/api/send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -167,7 +161,7 @@
         });
         return res.ok;
       } catch (err) {
-        console.error("Email sending error:", err);
+        console.error("Send email failed:", err);
         return false;
       }
     }
@@ -176,19 +170,18 @@
       const comment = document.getElementById(`comment-${id}`).value;
       try {
         const docRef = db.collection(`${type}_requests`).doc(id);
-        const snapshot = await docRef.get();
-        if (!snapshot.exists) return alert("❌ Request not found.");
-        const data = snapshot.data();
+        const docSnapshot = await docRef.get();
+        if (!docSnapshot.exists) return alert("❌ Request not found.");
+        const data = docSnapshot.data();
         const email = data.email || (data.departments && data.departments.email) || '';
         if (!email) return alert("❌ No email found.");
         await docRef.update({ status, comment });
         const sent = await sendEmailViaServer(email, status, comment);
-        if (sent) alert("✅ Email sent!");
-        else alert("❌ Failed to send email.");
+        alert(sent ? "✅ Email sent!" : "❌ Failed to send email.");
         loadData(type);
       } catch (err) {
-        console.error("Update error:", err);
-        alert("❌ Error: " + (err.message || err));
+        console.error(err);
+        alert("❌ General error: " + (err.message || err));
       }
     }
 
@@ -199,14 +192,8 @@
       container.appendChild(oldRefresh);
       try {
         const snapshot = await db.collection(`${type}_requests`).get();
-        if (snapshot.empty) {
-          container.innerHTML += `<p>No ${type} requests found.</p>`;
-          return;
-        }
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          container.innerHTML += renderCard(type, doc.id, data);
-        });
+        if (snapshot.empty) return container.innerHTML += `<p>No ${type} requests found.</p>`;
+        snapshot.forEach(doc => container.innerHTML += renderCard(type, doc.id, doc.data()));
       } catch (err) {
         container.innerHTML = `<p style="color:red;">Error loading ${type}</p>`;
       }
