@@ -150,7 +150,7 @@
 
     async function sendEmailViaServer(email, status, comment) {
       try {
-        const res = await fetch("https://cma-email-server-api.vercel.app/api/send", {
+        const res = await fetch("https://cma-email-server.onrender.com/api/send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
