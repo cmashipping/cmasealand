@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - CMA SEA LAND</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #001c2c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+    }
+    .login-container {
+      background-color: #07324f;
+      padding: 2rem 3rem;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #00bcd4;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1.5rem;
+      border: none;
+      border-radius: 5px;
+    }
+    .btn {
+      width: 100%;
+      padding: 0.7rem;
+      background-color: #00bcd4;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #0099aa;
+    }
+    .footer-links {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    .footer-links a {
+      color: #9ad1df;
+      text-decoration: none;
+      display: block;
+      margin: 0.3rem 0;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+    .back-btn {
+      margin-top: 1rem;
+      display: inline-block;
+      background-color: transparent;
+      color: #9ad1df;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login to CMA SEA LAND</h2>
+    <form onsubmit="handleLogin(event)">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" placeholder="Enter your email" required />
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" required />
+      <button class="btn" type="submit">Login</button>
+    </form>
+
+    <div class="footer-links">
+      <a href="forgot-password.html">Forgot your password?</a>
+      <a href="register-company-final-cloudinary.html">New user? Create an account</a>
+    </div>
+
+    <button class="back-btn" onclick="history.back()">&larr; Back</button>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBN7fyXXqP1287sNU3YooVmvxRoPd4mcho",
+      authDomain: "cma-sea-land-bb064.firebaseapp.com",
+      projectId: "cma-sea-land-bb064"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      try {
+        const snapshot = await db.collection("admins").where("username", "==", email).get();
+        if (snapshot.empty) return alert("❌ Email not found");
+
+        const doc = snapshot.docs[0];
+        const data = doc.data();
+        if (data.password === password) {
+          localStorage.setItem("adminLoggedIn", "true");
+          alert("✅ Login successful");
+          window.location.href = "admin-dashboard.html";
+        } else {
+          alert("❌ Incorrect password");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("⚠️ Login error");
+      }
+    }
+  </script>
+</body>
+</html>
