@@ -58,7 +58,7 @@
   <div class="login-box">
     <h2>Admin Login</h2>
     <form onsubmit="loginAdmin(event)">
-      <label for="email">Username</label>
+      <label for="admins">Username</label>
       <label for="password">Password</label>
       <input type="password" id="password" required />
       <button type="submit">Login</button>
@@ -78,7 +78,7 @@
 
     async function loginAdmin(e) {
       e.preventDefault();
-      const email = document.getElementById("email").value.trim();
+      const email = document.getElementById("admins").value.trim();
       const password = document.getElementById("password").value.trim();
 
       try {
