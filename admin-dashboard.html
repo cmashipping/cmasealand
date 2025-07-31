@@ -85,9 +85,32 @@
       cursor: pointer;
       margin-bottom: 10px;
     }
+    .logout-container {
+      text-align: right;
+      padding: 10px;
+    }
+    .logout-container button {
+      padding: 6px 12px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+
+  <script>
+    // 🔒 Check login before showing the dashboard
+    if (localStorage.getItem("adminLoggedIn") !== "true") {
+      window.location.href = "admin-login.html";
+    }
+  </script>
+
+  <div class="logout-container">
+    <button onclick="logout()">🚪 Logout</button>
+  </div>
 
   <div class="tabs">
     <button class="tab active" onclick="showTab('company')">Companies</button>
@@ -200,6 +223,12 @@
     }
 
     tabs.forEach(loadData);
+
+    // 🔚 Logout function
+    function logout() {
+      localStorage.removeItem("adminLoggedIn");
+      window.location.href = "admin-login.html";
+    }
   </script>
 </body>
 </html>
