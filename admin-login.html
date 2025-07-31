@@ -55,6 +55,14 @@
   </style>
 </head>
 <body>
+
+  <!-- 🔐 إذا الأدمن مسجل دخول، يذهب مباشرة للداشبورد -->
+  <script>
+    if (localStorage.getItem("adminLoggedIn") === "true") {
+      window.location.href = "admin-dashboard.html";
+    }
+  </script>
+
   <div class="login-box">
     <h2>Admin Login</h2>
     <form onsubmit="loginAdmin(event)">
